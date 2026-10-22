@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frédéric Jaccard — Enseignant d'informatique</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23155E4C'/%3E%3Ctext x='32' y='43' font-family='Arial,sans-serif' font-size='28' font-weight='bold' fill='%23FBFAF6' text-anchor='middle'%3EFJ%3C/text%3E%3C/svg%3E">
+<meta name="description" content="Frédéric Jaccard, enseignant d'informatique au gymnase (canton de Vaud) : applications interactives pour les cours, ressources et contact.">
+<link href="https://fonts.googleapis.com/css2?family=Quattrocento+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FBFAF6; --card:#F7F6F2; --primary:#155E4C; --primaryLight:#E3F0EA;
+  --accent:#D96A08; --accentLight:#FDEBD8; --line:#D8D5CB; --ink:#20241F; --muted:#6E726B;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:"Quattrocento Sans",sans-serif;
+  padding:32px 16px;min-height:100vh;display:flex;flex-direction:column}
+.app{max-width:760px;margin:0 auto;width:100%;flex:1}
+.topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.kicker{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+h1{font-size:28px;font-weight:700;color:var(--primary)}
+.sub{font-size:15px;color:var(--muted);margin:10px 0 28px;line-height:1.55;max-width:560px}
+.btns{display:flex;gap:8px;flex-shrink:0;padding-top:2px}
+button,.iconBtn{min-width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--card);
+  color:var(--primary);font-weight:700;font-size:13px;display:inline-flex;align-items:center;justify-content:center;
+  padding:0 12px;cursor:pointer;font-family:inherit}
+button:hover,.iconBtn:hover{border-color:var(--primary)}
+a.iconBtn{text-decoration:none}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+.cardApp{display:block;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);
+  border-radius:14px;padding:20px;transition:border-color .15s,transform .15s}
+.cardApp:hover{border-color:var(--primary);transform:translateY(-2px)}
+.cardApp .em{font-size:34px;line-height:1;margin-bottom:12px}
+.cardApp h2{font-size:17px;font-weight:700;margin-bottom:4px}
+.cardApp .tag{display:inline-block;font-size:11px;font-weight:700;border-radius:6px;padding:2px 8px;
+  background:var(--primaryLight);color:var(--primary);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em}
+.cardApp p{font-size:13.5px;line-height:1.5;color:var(--muted)}
+footer{margin-top:32px;text-align:center;font-size:13px;color:var(--muted)}
+@media(max-width:640px){
+  body{padding:20px 12px}
+  h1{font-size:22px}
+  .grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div>
+      <div class="kicker" id="kicker"></div>
+      <h1 id="title"></h1>
+    </div>
+    <div class="btns">
+      <button id="langBtn" title="English">EN</button>
+      <button id="fsBtn" title="Plein écran">⛶</button>
+    </div>
+  </div>
+  <div class="sub" id="sub"></div>
+  <div class="grid" id="grid"></div>
+  <footer>Frédéric Jaccard</footer>
+</div>
+
+<script>
+let lang = (function(){try{var s=localStorage.getItem("fj-lang");return (s==="fr"||s==="en")?s:"fr";}catch(e){return "fr";}})();
+const SECTIONS = {
+  fr:[
+    {href:"https://gymnase.fredericjaccard.com", em:"💻", tag:"Enseignement",
+     title:"Applications interactives",
+     desc:"Mes applications web pour les cours d'informatique au gymnase : binaire, algorithmique, logique, architecture. Bilingues, sans installation."},
+    {href:null, em:"👤", tag:"Bientôt", title:"À propos",
+     desc:"Parcours, enseignement et projets. Cette section arrive prochainement."},
+    {href:null, em:"✉️", tag:"Bientôt", title:"Contact",
+     desc:"Comment me joindre. Cette section arrive prochainement."}
+  ],
+  en:[
+    {href:"https://gymnase.fredericjaccard.com", em:"💻", tag:"Teaching",
+     title:"Interactive applications",
+     desc:"My web apps for high school computer science: binary, algorithms, logic, architecture. Bilingual, no installation needed."},
+    {href:null, em:"👤", tag:"Soon", title:"About",
+     desc:"Background, teaching and projects. This section is coming soon."},
+    {href:null, em:"✉️", tag:"Soon", title:"Contact",
+     desc:"How to reach me. This section is coming soon."}
+  ]
+};
+const I18N = {
+  fr:{ kicker:"ENSEIGNANT D'INFORMATIQUE · GYMNASE", title:"Frédéric Jaccard",
+    sub:"Bienvenue ! Ce site regroupe mes activités. Pour l'instant, vous y trouverez surtout les applications que j'utilise dans mes cours au gymnase.",
+    langBtn:"EN", fsTitle:"Plein écran" },
+  en:{ kicker:"COMPUTER SCIENCE TEACHER · HIGH SCHOOL", title:"Frédéric Jaccard",
+    sub:"Welcome! This site gathers my activities. For now, you will mostly find the apps I use in my high school computer science classes.",
+    langBtn:"FR", fsTitle:"Fullscreen" }
+};
+const T = () => I18N[lang];
+function applyLang(){
+  document.documentElement.lang = lang;
+  document.title = T().title + " — " + (lang==="fr" ? "Enseignant d'informatique" : "Computer science teacher");
+  document.getElementById("kicker").textContent = T().kicker;
+  document.getElementById("title").textContent = T().title;
+  document.getElementById("sub").textContent = T().sub;
+  document.getElementById("langBtn").textContent = T().langBtn;
+  document.getElementById("fsBtn").title = T().fsTitle;
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+  SECTIONS[lang].forEach(s => {
+    const c = document.createElement(s.href ? "a" : "div");
+    c.className = "cardApp";
+    if(s.href){ c.href = s.href; }
+    else { c.style.opacity = "0.75"; c.style.cursor = "default"; }
+    c.innerHTML = `<div class="em">${s.em}</div><span class="tag">${s.tag}</span><h2>${s.title}</h2><p>${s.desc}</p>`;
+    grid.appendChild(c);
+  });
+}
+document.getElementById("langBtn").onclick = () => {
+  lang = lang==="fr" ? "en" : "fr"; try{localStorage.setItem("fj-lang",lang);}catch(e){}
+  applyLang();
+};
+const fsBtn = document.getElementById("fsBtn");
+function isFs(){return document.fullscreenElement||document.webkitFullscreenElement;}
+fsBtn.onclick = () => {
+  if(isFs()){(document.exitFullscreen||document.webkitExitFullscreen).call(document);}
+  else{const el=document.documentElement,req=el.requestFullscreen||el.webkitRequestFullscreen;if(req)req.call(el);}
+};
+function fsChange(){fsBtn.style.background=isFs()?"var(--primaryLight)":"var(--card)";}
+document.addEventListener("fullscreenchange",fsChange);
+document.addEventListener("webkitfullscreenchange",fsChange);
+applyLang();
+</script>
+</body>
+</html>
