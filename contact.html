@@ -60,7 +60,7 @@ footer a:hover{color:var(--primary);text-decoration:underline}
 </header>
 <a class="backTop" href="index.html" id="backTop"></a>
 <div class="intro" id="intro"></div>
-<form id="contactForm" novalidate>
+<form id="contactForm" action="https://formsubmit.co/frederic.jaccard@gmail.com" method="POST">
   <div class="field">
     <label for="fName" id="lName"></label>
     <input id="fName" name="name" type="text" required autocomplete="name">
@@ -73,6 +73,10 @@ footer a:hover{color:var(--primary);text-decoration:underline}
     <label for="fMsg" id="lMsg"></label>
     <textarea id="fMsg" name="message" required></textarea>
   </div>
+  <input type="hidden" name="_subject" value="Message depuis fredericjaccard.com">
+  <input type="hidden" name="_template" value="table">
+  <input type="hidden" name="_captcha" value="false">
+  <input type="hidden" name="_next" value="https://www.fredericjaccard.com/contact.html?envoye=1">
   <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
   <div class="btnRow">
     <button id="sendBtn" type="submit"></button>
@@ -90,8 +94,7 @@ const I18N = {
   title:"Me contacter",
   intro:"Une question sur les applications, les cours ou un projet pédagogique ? Écrivez-moi via ce formulaire, je vous répondrai par e-mail.",
   lName:"Votre nom", lEmail:"Votre adresse e-mail", lMsg:"Votre message",
-  send:"Envoyer", sending:"Envoi…",
-  ok:"Message envoyé, merci !", err:"L'envoi a échoué — réessayez plus tard.",
+  send:"Envoyer", sending:"Envoi en cours…",
   invalid:"Merci de remplir tous les champs (e-mail valide).",
   note:"Votre message est transmis directement à ma boîte mail. Je réponds en général sous quelques jours ouvrés." },
  en:{ kicker:"CONTACT", backTop:"← Home page", footBack:"← Home page",
@@ -99,7 +102,6 @@ const I18N = {
   intro:"A question about the applications, my classes or an educational project? Write to me via this form and I will reply by email.",
   lName:"Your name", lEmail:"Your email address", lMsg:"Your message",
   send:"Send", sending:"Sending…",
-  ok:"Message sent, thank you!", err:"Sending failed — please try again later.",
   invalid:"Please fill in all fields (valid email).",
   note:"Your message is delivered straight to my inbox. I usually reply within a few working days." }
 };
@@ -132,7 +134,6 @@ document.addEventListener("fullscreenchange", fsUpd);
 document.addEventListener("webkitfullscreenchange", fsUpd);
 
 $("contactForm").addEventListener("submit", function(e){
-  e.preventDefault();
   const t = T();
   const name = $("fName").value.trim();
   const email = $("fEmail").value.trim();
@@ -140,23 +141,16 @@ $("contactForm").addEventListener("submit", function(e){
   const status = $("status");
   status.className = "";
   if(!name || !email || !message || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){
+    e.preventDefault();
     status.textContent = t.invalid; status.className = "err"; return;
   }
-  $("sendBtn").disabled = true;
   $("sendBtn").textContent = t.sending;
-  fetch("https://formsubmit.co/ajax/frederic.jaccard@gmail.com", {
-    method: "POST",
-    headers: {"Content-Type": "application/json", "Accept": "application/json"},
-    body: JSON.stringify({name: name, email: email, message: message, _subject: "Message depuis fredericjaccard.com", _template: "table", _captcha: "false"})
-  })
-  .then(r => { if(!r.ok) throw new Error(); return r.json(); })
-  .then(() => {
-    status.textContent = t.ok; status.className = "ok";
-    $("contactForm").reset();
-  })
-  .catch(() => { status.textContent = t.err; status.className = "err"; })
-  .finally(() => { $("sendBtn").disabled = false; $("sendBtn").textContent = t.send; });
 });
+if(/[?&]envoye=1/.test(location.search)){
+  const st = $("status");
+  st.textContent = (function(){try{var s=localStorage.getItem("fj-lang");return (s==="fr"||s==="en")?s:"fr";}catch(e){return "fr";}})() === "fr" ? "Message envoyé, merci !" : "Message sent, thank you!";
+  st.className = "ok";
+}
 applyLang();
 </script>
 </body>
