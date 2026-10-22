@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>À propos · Gymnase — Frédéric Jaccard</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23155E4C'/%3E%3Ctext x='32' y='43' font-family='Arial,sans-serif' font-size='28' font-weight='bold' fill='%23FBFAF6' text-anchor='middle'%3EFJ%3C/text%3E%3C/svg%3E">
+<meta name="description" content="Parcours de Frédéric Jaccard, enseignant d'informatique et de mathématiques, ingénieur EPFL : Suisse, Nouvelle-Zélande, Australie.">
+<link href="https://fonts.googleapis.com/css2?family=Quattrocento+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FBFAF6; --card:#F7F6F2; --primary:#155E4C; --primaryLight:#E3F0EA;
+  --accent:#D96A08; --accentLight:#FDEBD8; --line:#D8D5CB; --ink:#20241F; --muted:#6E726B;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:"Quattrocento Sans",sans-serif;padding:24px 16px}
+.app{max-width:760px;margin:0 auto}
+header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:8px}
+.kicker{font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
+h1{font-size:26px;color:var(--primary)}
+.role{font-size:16px;color:var(--muted);margin-top:2px}
+.hdrBtns{display:flex;gap:8px}
+button{font-family:inherit;font-size:14px;font-weight:700;padding:8px 16px;border-radius:10px;border:2px solid var(--primary);background:var(--card);color:var(--primary);cursor:pointer}
+button:hover{background:var(--primaryLight)}
+a.backTop{display:inline-block;margin:0 0 20px;font-size:13px;color:var(--muted);text-decoration:none}
+a.backTop:hover{color:var(--primary);text-decoration:underline}
+.summary{background:var(--primaryLight);border-radius:12px;padding:14px 16px;font-size:15px;line-height:1.55;margin-bottom:24px}
+.chapTitle{font-size:13px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.12em;margin:24px 0 12px}
+.timeline{border-left:3px solid var(--primaryLight);margin-left:6px;padding-left:18px}
+.job{position:relative;margin-bottom:18px}
+.job::before{content:"";position:absolute;left:-26.5px;top:4px;width:11px;height:11px;border-radius:50%;background:var(--primary);border:2px solid var(--bg)}
+.job .when{font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.04em}
+.job h2{font-size:17px;color:var(--ink);margin:2px 0}
+.job .where{font-size:13.5px;color:var(--muted);margin-bottom:4px}
+.job p{font-size:14px;line-height:1.5;color:var(--ink)}
+ul.edu{list-style:none}
+ul.edu li{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:8px;font-size:14px;line-height:1.45}
+ul.edu li b{color:var(--primary)}
+ul.edu li .d{display:block;font-size:12.5px;color:var(--muted);margin-top:2px}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{background:var(--primaryLight);color:var(--primary);font-size:13px;font-weight:700;border-radius:999px;padding:6px 14px}
+.note{font-size:13px;color:var(--muted);line-height:1.5;margin-top:16px}
+footer{margin-top:28px;text-align:center;font-size:13px;color:var(--muted)}
+footer a{color:var(--muted);text-decoration:none}
+footer a:hover{color:var(--primary);text-decoration:underline}
+@media(max-width:600px){
+  body{padding:16px 12px}
+  h1{font-size:22px}
+  .timeline{margin-left:2px;padding-left:14px}
+  .job::before{left:-21.5px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div>
+    <div class="kicker" id="kicker"></div>
+    <h1 id="title"></h1>
+    <div class="role" id="role"></div>
+  </div>
+  <div class="hdrBtns">
+    <button id="langBtn" type="button"></button>
+    <button id="fsBtn" type="button"><span id="fsLabel"></span></button>
+  </div>
+</header>
+<a class="backTop" href="index.html" id="backTop"></a>
+<div class="summary" id="summary"></div>
+<div class="chapTitle" id="tExp"></div>
+<div class="timeline" id="exp"></div>
+<div class="chapTitle" id="tEdu"></div>
+<ul class="edu" id="edu"></ul>
+<div class="chapTitle" id="tDist"></div>
+<ul class="edu" id="dist"></ul>
+<div class="chapTitle" id="tLang"></div>
+<div class="pills" id="langPills"></div>
+<div class="note" id="note"></div>
+<footer><a href="index.html" id="footBack"></a> · <a href="https://www.fredericjaccard.com">Frédéric Jaccard</a></footer>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+let lang = (function(){try{var s=localStorage.getItem("fj-lang");return (s==="fr"||s==="en")?s:"fr";}catch(e){return "fr";}})();
+const DATA = {
+ fr:{
+  kicker:"À PROPOS", backTop:"← Page d'accueil", footBack:"← Page d'accueil",
+  title:"Frédéric Jaccard", role:"Enseignant & ingénieur",
+  summary:"Enseignant de mathématiques et d'informatique, ingénieur EPFL, avec 20 ans d'expérience dans l'enseignement secondaire en Suisse et à l'international, dont des cours particuliers premium en mathématiques et informatique. Conception et animation de formations (intelligence artificielle), coaching pédagogique et leadership de faculté. Passionné par la vulgarisation des mathématiques et de l'informatique auprès des jeunes.",
+  tExp:"Parcours", tEdu:"Formation", tDist:"Distinctions", tLang:"Langues",
+  exp:[
+   {when:"2026 — aujourd'hui", what:"Enseignant d'informatique", where:"Gymnase Provence · Gymnase pour Adultes · Gymnase de Renens, Lausanne",
+    txt:"Enseignement au Secondaire II, informatique de la 1ère à la 3e année du gymnase. Création d'applications web pédagogiques interactives et de supports de cours."},
+   {when:"2025 — 2026", what:"Enseignant de mathématiques", where:"International School of Lausanne",
+    txt:"Enseignement au Secondaire I et au Secondaire II, maître de classe. Intégration de concepts informatiques et usage pédagogique de l'IA."},
+   {when:"2023 — 2025", what:"Enseignant de mathématiques · Directeur du secondaire · Coordinateur IB DP", where:"Verbier International School",
+    txt:"Enseignement au Secondaire I et au Secondaire II, maître de classe. Structures académiques pour l'accréditation IB DP, gestion des standards académiques et pastoraux, formation du corps enseignant à l'usage pédagogique de l'IA."},
+   {when:"2016 — 2022", what:"Enseignant de mathématiques · Responsable mathématiques (middle school)", where:"Kristin School, Auckland, Nouvelle-Zélande",
+    txt:"Enseignement au Secondaire I et au Secondaire II, maître de classe. Leadership pédagogique pour 20 enseignants, chef de faculté par intérim, conception du curriculum IB MYP, coaching d'enseignants."},
+   {when:"2010 — 2015", what:"Enseignant d'informatique et de mathématiques", where:"Xavier College, Australie",
+    txt:"Enseignement au Secondaire I et au Secondaire II, maître de classe. Conception de projets en programmation et développement logiciel, formations pour enseignants, publications en collaboration avec une université."},
+   {when:"2008 — 2009", what:"Enseignant de mathématiques", where:"The Hills Grammar School, Australie",
+    txt:"Enseignement au Secondaire I et au Secondaire II, maître de classe."}
+  ],
+  edu:[
+   {b:"Postgraduate Certificate in Applied Practice (Digital & Collaborative Learning)", d:"The Mind Lab by Unitec — Auckland, Nouvelle-Zélande · 2016 – 2017"},
+   {b:"Graduate Diploma in Education (informatique, mathématiques)", d:"Université Macquarie — Sydney, Australie · 2007"},
+   {b:"Ingénieur EPFL en informatique (MSc)", d:"EPFL — Lausanne, Suisse · 2000 – 2005"},
+   {b:"Certificat de maturité (baccalauréat scientifique)", d:"Gymnase de Beaulieu — Lausanne · 2000"}
+  ],
+  langs:["Français","Anglais"],
+  dist:[
+   {b:"Kalman Teacher Fellowship", d:"Margaret and John Kalman Trust · Nouvelle-Zélande · 2021 — projet « Show me what you know », innovation pédagogique et engagement des élèves"},
+   {b:"Ernest Duncan Award for Teaching Mathematics", d:"New Zealand Association of Maths Teachers · 2017 — article sur l'utilisation de tâches riches en classe de mathématiques"}
+  ],
+  note:"Avant l'enseignement : chargé de cours à l'Université Macquarie, ingénieur de recherche au CSIRO (Australie), développeur stagiaire chez Logitech, création de la start-up Nimag Networks Sàrl (Lausanne)."
+ },
+ en:{
+  kicker:"ABOUT", backTop:"← Home page", footBack:"← Home page",
+  title:"Frédéric Jaccard", role:"Teacher & engineer",
+  summary:"Mathematics and computer science teacher, EPFL engineer, with 20 years of experience in secondary education in Switzerland and internationally, including premium private tutoring in mathematics and computing. Designer and facilitator of professional development (artificial intelligence), pedagogical coach and faculty leader. Passionate about making mathematics and computer science accessible to young people.",
+  tExp:"Career", tEdu:"Education", tDist:"Recognition", tLang:"Languages",
+  exp:[
+   {when:"2026 — present", what:"Computer science teacher", where:"Gymnase Provence · Gymnase pour Adultes · Gymnase de Renens, Lausanne",
+    txt:"Teaching at upper secondary level — computer science, Years 1–3 of the Swiss gymnasium. Creation of interactive educational web applications and course materials."},
+   {when:"2025 — 2026", what:"Mathematics teacher", where:"International School of Lausanne",
+    txt:"Teaching across lower and upper secondary, form tutor. Integration of computer science concepts and pedagogical use of AI."},
+   {when:"2023 — 2025", what:"Mathematics teacher · Head of Secondary · IB DP Coordinator", where:"Verbier International School",
+    txt:"Teaching across lower and upper secondary, form tutor. Academic structures for IB DP accreditation, academic and pastoral standards, AI training for the teaching body."},
+   {when:"2016 — 2022", what:"Mathematics teacher · Head of Middle School Mathematics", where:"Kristin School, Auckland, New Zealand",
+    txt:"Teaching across lower and upper secondary, form tutor. Pedagogical leadership for 20 teachers, acting Head of Faculty, IB MYP curriculum design, teacher coaching."},
+   {when:"2010 — 2015", what:"Computer science & mathematics teacher", where:"Xavier College, Australia",
+    txt:"Teaching across lower and upper secondary, form tutor. Programming and software development projects, teacher training, university co-authored conference publications."},
+   {when:"2008 — 2009", what:"Mathematics teacher", where:"The Hills Grammar School, Australia",
+    txt:"Teaching across lower and upper secondary, form tutor."}
+  ],
+  edu:[
+   {b:"Postgraduate Certificate in Applied Practice (Digital & Collaborative Learning)", d:"The Mind Lab by Unitec — Auckland, New Zealand · 2016 – 2017"},
+   {b:"Graduate Diploma in Education (computer science, mathematics)", d:"Macquarie University — Sydney, Australia · 2007"},
+   {b:"EPFL engineer in computer science (MSc)", d:"EPFL — Lausanne, Switzerland · 2000 – 2005"},
+   {b:"Swiss federal maturity certificate (scientific baccalaureate)", d:"Gymnase de Beaulieu — Lausanne · 2000"}
+  ],
+  langs:["French","English"],
+  dist:[
+   {b:"Kalman Teacher Fellowship", d:"Margaret and John Kalman Trust · New Zealand · 2021 — “Show me what you know” project, teaching innovation and student engagement"},
+   {b:"Ernest Duncan Award for Teaching Mathematics", d:"New Zealand Association of Maths Teachers · 2017 — article on the use of rich tasks in the mathematics classroom"}
+  ],
+  note:"Before teaching: university tutor at Macquarie University, research engineer at CSIRO (Australia), software development intern at Logitech, founded the start-up Nimag Networks Sàrl (Lausanne)."
+ }
+};
+const T = () => DATA[lang];
+function applyLang(){
+  const t = T();
+  document.documentElement.lang = lang;
+  document.title = (lang==="fr" ? "À propos" : "About") + " · Gymnase — Frédéric Jaccard";
+  $("kicker").textContent = t.kicker;
+  $("title").textContent = t.title;
+  $("role").textContent = t.role;
+  $("backTop").textContent = t.backTop;
+  $("summary").textContent = t.summary;
+  $("tExp").textContent = t.tExp;
+  $("tEdu").textContent = t.tEdu;
+  $("tLang").textContent = t.tLang;
+  $("footBack").textContent = t.footBack;
+  $("langBtn").textContent = lang==="fr" ? "English" : "Français";
+  $("fsLabel").textContent = isFs() ? "Quitter" : "Plein écran";
+  $("exp").innerHTML = t.exp.map(j =>
+    `<div class="job"><div class="when">${j.when}</div><h2>${j.what}</h2><div class="where">${j.where}</div><p>${j.txt}</p></div>`).join("");
+  $("dist").innerHTML = t.dist.map(e =>
+    `<li><b>${e.b}</b><span class="d">${e.d}</span></li>`).join("");
+  $("tDist").textContent = t.tDist;
+  $("edu").innerHTML = t.edu.map(e =>
+    `<li><b>${e.b}</b><span class="d">${e.d}</span></li>`).join("");
+  $("langPills").innerHTML = t.langs.map(l => `<span class="pill">${l}</span>`).join("");
+  $("note").textContent = t.note;
+}
+$("langBtn").onclick = () => { lang = lang==="fr" ? "en" : "fr"; try{localStorage.setItem("fj-lang",lang);}catch(e){} applyLang(); };
+function isFs(){return document.fullscreenElement||document.webkitFullscreenElement;}
+$("fsBtn").onclick = () => {
+  if(isFs()){(document.exitFullscreen||document.webkitExitFullscreen).call(document);}
+  else{var el=document.documentElement,req=el.requestFullscreen||el.webkitRequestFullscreen;if(req)req.call(el);}
+};
+function fsUpd(){$("fsLabel").textContent = isFs() ? "Quitter" : "Plein écran";}
+document.addEventListener("fullscreenchange", fsUpd);
+document.addEventListener("webkitfullscreenchange", fsUpd);
+applyLang();
+</script>
+</body>
+</html>
