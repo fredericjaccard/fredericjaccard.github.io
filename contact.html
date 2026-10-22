@@ -94,14 +94,14 @@ const I18N = {
   title:"Me contacter",
   intro:"Une question sur les applications, les cours ou un projet pédagogique ? Écrivez-moi via ce formulaire, je vous répondrai par e-mail.",
   lName:"Votre nom", lEmail:"Votre adresse e-mail", lMsg:"Votre message",
-  send:"Envoyer", sending:"Envoi en cours…",
+  send:"Envoyer", sending:"Envoi en cours…", ok:"Message envoyé, merci !", err:"L'envoi a échoué — réessayez plus tard.",
   invalid:"Merci de remplir tous les champs (e-mail valide).",
   note:"Votre message est transmis directement à ma boîte mail. Je réponds en général sous quelques jours ouvrés." },
  en:{ kicker:"CONTACT", backTop:"← Home page", footBack:"← Home page",
   title:"Get in touch",
   intro:"A question about the applications, my classes or an educational project? Write to me via this form and I will reply by email.",
   lName:"Your name", lEmail:"Your email address", lMsg:"Your message",
-  send:"Send", sending:"Sending…",
+  send:"Send", sending:"Sending…", ok:"Message sent, thank you!", err:"Sending failed — please try again later.",
   invalid:"Please fill in all fields (valid email).",
   note:"Your message is delivered straight to my inbox. I usually reply within a few working days." }
 };
@@ -135,6 +135,7 @@ document.addEventListener("webkitfullscreenchange", fsUpd);
 
 $("contactForm").addEventListener("submit", function(e){
   const t = T();
+  const form = this;
   const name = $("fName").value.trim();
   const email = $("fEmail").value.trim();
   const message = $("fMsg").value.trim();
@@ -144,7 +145,23 @@ $("contactForm").addEventListener("submit", function(e){
     e.preventDefault();
     status.textContent = t.invalid; status.className = "err"; return;
   }
+  e.preventDefault();
+  $("sendBtn").disabled = true;
   $("sendBtn").textContent = t.sending;
+  status.textContent = t.sending; status.className = "";
+  fetch("https://formsubmit.co/ajax/frederic.jaccard@gmail.com", {
+    method: "POST",
+    headers: {"Content-Type": "application/json", "Accept": "application/json"},
+    body: JSON.stringify({name: name, email: email, message: message, _subject: "Message depuis fredericjaccard.com", _template: "table", _captcha: "false"})
+  })
+  .then(r => { if(!r.ok) throw new Error(); return r.json(); })
+  .then(() => {
+    status.textContent = t.ok; status.className = "ok";
+    form.reset();
+    $("sendBtn").disabled = false;
+    $("sendBtn").textContent = t.send;
+  })
+  .catch(() => { form.submit(); });
 });
 if(/[?&]envoye=1/.test(location.search)){
   const st = $("status");
