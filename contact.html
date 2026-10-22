@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact · Gymnase — Frédéric Jaccard</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23155E4C'/%3E%3Ctext x='32' y='43' font-family='Arial,sans-serif' font-size='28' font-weight='bold' fill='%23FBFAF6' text-anchor='middle'%3EFJ%3C/text%3E%3C/svg%3E">
+<meta name="description" content="Contacter Frédéric Jaccard, enseignant d'informatique au gymnase (canton de Vaud).">
+<link href="https://fonts.googleapis.com/css2?family=Quattrocento+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FBFAF6; --card:#F7F6F2; --primary:#155E4C; --primaryLight:#E3F0EA;
+  --accent:#D96A08; --accentLight:#FDEBD8; --line:#D8D5CB; --ink:#20241F; --muted:#6E726B;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:"Quattrocento Sans",sans-serif;padding:24px 16px}
+.app{max-width:640px;margin:0 auto}
+header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:8px}
+.kicker{font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
+h1{font-size:26px;color:var(--primary)}
+.hdrBtns{display:flex;gap:8px}
+button{font-family:inherit;font-size:14px;font-weight:700;padding:8px 16px;border-radius:10px;border:2px solid var(--primary);background:var(--card);color:var(--primary);cursor:pointer}
+button:hover{background:var(--primaryLight)}
+button:disabled{opacity:.6;cursor:default}
+a.backTop{display:inline-block;margin:0 0 20px;font-size:13px;color:var(--muted);text-decoration:none}
+a.backTop:hover{color:var(--primary);text-decoration:underline}
+.intro{font-size:15px;color:var(--muted);line-height:1.55;margin-bottom:20px}
+form{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+label{display:block;font-size:13px;font-weight:700;color:var(--ink);margin:0 0 6px}
+.field{margin-bottom:14px}
+input,textarea{width:100%;font-family:inherit;font-size:15px;color:var(--ink);background:var(--bg);
+  border:2px solid var(--line);border-radius:10px;padding:10px 12px}
+input:focus,textarea:focus{outline:none;border-color:var(--primary)}
+textarea{min-height:130px;resize:vertical}
+.btnRow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+#status{font-size:14px;font-weight:700;display:none}
+#status.ok{color:var(--primary);display:block}
+#status.err{color:#B3261E;display:block}
+.note{font-size:13px;color:var(--muted);line-height:1.5;margin-top:16px}
+footer{margin-top:28px;text-align:center;font-size:13px;color:var(--muted)}
+footer a{color:var(--muted);text-decoration:none}
+footer a:hover{color:var(--primary);text-decoration:underline}
+@media(max-width:600px){
+  body{padding:16px 12px}
+  h1{font-size:22px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div>
+    <div class="kicker" id="kicker"></div>
+    <h1 id="title"></h1>
+  </div>
+  <div class="hdrBtns">
+    <button id="langBtn" type="button"></button>
+    <button id="fsBtn" type="button"><span id="fsLabel"></span></button>
+  </div>
+</header>
+<a class="backTop" href="index.html" id="backTop"></a>
+<div class="intro" id="intro"></div>
+<form id="contactForm" novalidate>
+  <div class="field">
+    <label for="fName" id="lName"></label>
+    <input id="fName" name="name" type="text" required autocomplete="name">
+  </div>
+  <div class="field">
+    <label for="fEmail" id="lEmail"></label>
+    <input id="fEmail" name="email" type="email" required autocomplete="email">
+  </div>
+  <div class="field">
+    <label for="fMsg" id="lMsg"></label>
+    <textarea id="fMsg" name="message" required></textarea>
+  </div>
+  <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
+  <div class="btnRow">
+    <button id="sendBtn" type="submit"></button>
+    <div id="status"></div>
+  </div>
+</form>
+<div class="note" id="note"></div>
+<footer><a href="index.html" id="footBack"></a> · <a href="https://www.fredericjaccard.com">Frédéric Jaccard</a></footer>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+let lang = (function(){try{var s=localStorage.getItem("fj-lang");return (s==="fr"||s==="en")?s:"fr";}catch(e){return "fr";}})();
+const I18N = {
+ fr:{ kicker:"CONTACT", backTop:"← Page d'accueil", footBack:"← Page d'accueil",
+  title:"Me contacter",
+  intro:"Une question sur les applications, les cours ou un projet pédagogique ? Écrivez-moi via ce formulaire, je vous répondrai par e-mail.",
+  lName:"Votre nom", lEmail:"Votre adresse e-mail", lMsg:"Votre message",
+  send:"Envoyer", sending:"Envoi…",
+  ok:"Message envoyé, merci !", err:"L'envoi a échoué — réessayez plus tard.",
+  invalid:"Merci de remplir tous les champs (e-mail valide).",
+  note:"Votre message est transmis directement à ma boîte mail. Je réponds en général sous quelques jours ouvrés." },
+ en:{ kicker:"CONTACT", backTop:"← Home page", footBack:"← Home page",
+  title:"Get in touch",
+  intro:"A question about the applications, my classes or an educational project? Write to me via this form and I will reply by email.",
+  lName:"Your name", lEmail:"Your email address", lMsg:"Your message",
+  send:"Send", sending:"Sending…",
+  ok:"Message sent, thank you!", err:"Sending failed — please try again later.",
+  invalid:"Please fill in all fields (valid email).",
+  note:"Your message is delivered straight to my inbox. I usually reply within a few working days." }
+};
+const T = () => I18N[lang];
+function applyLang(){
+  const t = T();
+  document.documentElement.lang = lang;
+  document.title = "Contact · Gymnase — Frédéric Jaccard";
+  $("kicker").textContent = t.kicker;
+  $("title").textContent = t.title;
+  $("backTop").textContent = t.backTop;
+  $("intro").textContent = t.intro;
+  $("lName").textContent = t.lName;
+  $("lEmail").textContent = t.lEmail;
+  $("lMsg").textContent = t.lMsg;
+  if($("sendBtn").disabled === false) $("sendBtn").textContent = t.send;
+  $("footBack").textContent = t.footBack;
+  $("note").textContent = t.note;
+  $("langBtn").textContent = lang==="fr" ? "English" : "Français";
+  $("fsLabel").textContent = isFs() ? "Quitter" : "Plein écran";
+}
+$("langBtn").onclick = () => { lang = lang==="fr" ? "en" : "fr"; try{localStorage.setItem("fj-lang",lang);}catch(e){} applyLang(); };
+function isFs(){return document.fullscreenElement||document.webkitFullscreenElement;}
+$("fsBtn").onclick = () => {
+  if(isFs()){(document.exitFullscreen||document.webkitExitFullscreen).call(document);}
+  else{var el=document.documentElement,req=el.requestFullscreen||el.webkitRequestFullscreen;if(req)req.call(el);}
+};
+function fsUpd(){$("fsLabel").textContent = isFs() ? "Quitter" : "Plein écran";}
+document.addEventListener("fullscreenchange", fsUpd);
+document.addEventListener("webkitfullscreenchange", fsUpd);
+
+$("contactForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  const t = T();
+  const name = $("fName").value.trim();
+  const email = $("fEmail").value.trim();
+  const message = $("fMsg").value.trim();
+  const status = $("status");
+  status.className = "";
+  if(!name || !email || !message || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){
+    status.textContent = t.invalid; status.className = "err"; return;
+  }
+  $("sendBtn").disabled = true;
+  $("sendBtn").textContent = t.sending;
+  fetch("https://formsubmit.co/ajax/frederic.jaccard@gmail.com", {
+    method: "POST",
+    headers: {"Content-Type": "application/json", "Accept": "application/json"},
+    body: JSON.stringify({name: name, email: email, message: message, _subject: "Message depuis fredericjaccard.com", _template: "table", _captcha: "false"})
+  })
+  .then(r => { if(!r.ok) throw new Error(); return r.json(); })
+  .then(() => {
+    status.textContent = t.ok; status.className = "ok";
+    $("contactForm").reset();
+  })
+  .catch(() => { status.textContent = t.err; status.className = "err"; })
+  .finally(() => { $("sendBtn").disabled = false; $("sendBtn").textContent = t.send; });
+});
+applyLang();
+</script>
+</body>
+</html>
